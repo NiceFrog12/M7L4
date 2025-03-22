@@ -72,7 +72,8 @@ def test_wrong_password(setup_database, connection):
     assert not authenticate_user("testuser", "password122")
 
 def test_show_users(setup_database, capsys):
+    add_user("testuser", "testmail@mail.com", "testpassword")
     display_users()
     captured = capsys.readouterr() 
-    assert captured
+    assert "testpassword" not in captured.out, "Password must not be displayed"
     
