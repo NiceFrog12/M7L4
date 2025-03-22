@@ -44,3 +44,35 @@ def test_add_new_user(setup_database, connection):
 Тест аутентификации пользователя с неправильным паролем.
 Тест отображения списка пользователей.
 """
+
+
+def test_add_existing_user(setup_database, connection):
+    add_user("testuser", "testuser@test.com", "test123")
+    add_user("testuser", "testuser@test.com", "test123")
+    cursor = connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users WHERE username='testuser'")
+    amount = cursor.fetchone()
+    assert amount[0] == 1
+    
+def test_authentication(setup_database, connection):
+    assert authenticate_user("testuser", "password123")
+
+def test_new_user_authentication(setup_database, connection):
+    cursor = connection.cursor()
+    add_user("test-user", "testuser@test.com", "test123")
+    assert authenticate_user("test-user", "test123")
+
+def test_authentication_nonexistent_user(setup_database, connection):
+    cursor = connection.cursor()
+    assert not authenticate_user("notexistent", "testing")
+
+
+def test_wrong_password(setup_database, connection):
+    cursor = connection.cursor()
+    assert not authenticate_user("testuser", "password122")
+
+def test_show_users(setup_database, capsys):
+    display_users()
+    captured = capsys.readouterr() 
+    assert captured
+    
